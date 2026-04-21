@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UPSAMC Medical Portal - Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">🏥 UPSAMC</div>
+    <nav>
+      <button class="nav-btn active" data-section="records">📋 Patient Records</button>
+      <button class="nav-btn" data-section="add">➕ Add Record</button>
+      <button class="nav-btn" data-section="activity">📝 Activity Log</button>
+      <button class="nav-btn" data-section="sessions">👥 Staff Sessions</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="staff-badge">
+        <span class="staff-icon">👤</span>
+        <div>
+          <div class="staff-label">Logged in as</div>
+          <div class="staff-name" id="sidebarStaffName"></div>
+        </div>
+      </div>
+      <button class="btn btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-bar">
+      <div>
+        <h2 id="sectionTitle">Patient Records</h2>
+        <p class="welcome-msg">Welcome, <strong id="headerStaffName"></strong> — <span id="todayDate"></span></p>
+      </div>
+    </header>
+
+    <section id="section-records" class="section active">
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Search by name or student ID..." />
+      </div>
+      <div class="table-wrapper">
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Student ID</th>
+              <th>Visit Date</th>
+              <th>Visit Time</th>
+              <th>Attended By</th>
+              <th>Vitals</th>
+              <th>Medicine Prescribed</th>
+              <th>Bill Paid (₵)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+        <p id="noRecords" class="empty-msg hidden">No records found.</p>
+      </div>
+    </section>
+
+    <section id="section-add" class="section hidden">
+      <div class="form-card">
+        <h3 id="formTitle">New Patient Record</h3>
+        <input type="hidden" id="editIndex" value="" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Student Name</label>
+            <input type="text" id="f_name" placeholder="Full name" required />
+          </div>
+          <div class="form-group">
+            <label>Student ID</label>
+            <input type="text" id="f_id" placeholder="e.g. UPS/2021/001" required />
+          </div>
+          <div class="form-group">
+            <label>Visit Date</label>
+            <input type="date" id="f_date" required />
+          </div>
+          <div class="form-group">
+            <label>Visit Time</label>
+            <input type="time" id="f_time" required />
+          </div>
+          <div class="form-group">
+            <label>Attended By</label>
+            <input type="text" id="f_staff" placeholder="Staff name" required />
+          </div>
+          <div class="form-group full-width">
+            <label>Vitals</label>
+            <div class="vitals-grid">
+              <div class="vital-input-group">
+                <label class="vital-label">🩸 BP (mmHg)</label>
+                <div class="bp-inputs">
+                  <input type="number" id="f_bp_sys" placeholder="Systolic" min="0" max="300" />
+                  <span class="bp-sep">/</span>
+                  <input type="number" id="f_bp_dia" placeholder="Diastolic" min="0" max="200" />
+                </div>
+              </div>
+              <div class="vital-input-group">
+                <label class="vital-label">🌡️ Temp (°C)</label>
+                <input type="number" id="f_temp" placeholder="e.g. 36.5" min="30" max="45" step="0.1" />
+              </div>
+              <div class="vital-input-group">
+                <label class="vital-label">💓 Pulse (bpm)</label>
+                <input type="number" id="f_pulse" placeholder="e.g. 72" min="0" max="300" />
+              </div>
+              <div class="vital-input-group">
+                <label class="vital-label">⚖️ Weight (kg)</label>
+                <input type="number" id="f_weight" placeholder="e.g. 65" min="0" max="500" step="0.1" />
+              </div>
+              <div class="vital-input-group">
+                <label class="vital-label">📏 Height (cm)</label>
+                <input type="number" id="f_height" placeholder="e.g. 170" min="0" max="300" />
+              </div>
+              <div class="vital-input-group">
+                <label class="vital-label">🫁 SpO₂ (%)</label>
+                <input type="number" id="f_spo2" placeholder="e.g. 98" min="0" max="100" />
+              </div>
+              <div class="vital-input-group full-vital">
+                <label class="vital-label">📝 Other Observations</label>
+                <input type="text" id="f_vitals_other" placeholder="e.g. Patient appears pale, mild dehydration" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Medicine Prescribed</label>
+            <textarea id="f_medicine" rows="3" placeholder="e.g. Paracetamol 500mg x2 daily for 5 days"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Bill Paid (₵)</label>
+            <input type="number" id="f_bill" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="saveRecordBtn">Save Record</button>
+          <button class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+        </div>
+        <div id="formMsg" class="success-msg hidden"></div>
+      </div>
+    </section>
+
+    <section id="section-sessions" class="section hidden">
+      <div class="sessions-header">
+        <div>
+          <h3 class="sessions-title">Staff Sessions</h3>
+          <p class="sessions-sub">Live view of portal activity</p>
+        </div>
+        <div class="ws-status" id="wsStatus">
+          <span class="ws-dot"></span><span class="ws-label">Connecting...</span>
+        </div>
+      </div>
+
+      <div class="sessions-stats" id="sessionStats">
+        <div class="stat-card">
+          <div class="stat-num" id="statOnline">0</div>
+          <div class="stat-label">Online Now</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statToday">0</div>
+          <div class="stat-label">Sessions Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">Total Sessions</div>
+        </div>
+      </div>
+
+      <div class="sessions-container">
+        <div class="sessions-group">
+          <h4 class="sessions-heading">
+            <span class="pulse-ring"></span> Currently Online
+          </h4>
+          <ul id="activeSessions" class="session-list"></ul>
+          <p id="noActiveSessions" class="empty-msg hidden">No staff currently logged in.</p>
+        </div>
+        <div class="sessions-group">
+          <h4 class="sessions-heading">⏱ Previous Sessions</h4>
+          <ul id="pastSessions" class="session-list"></ul>
+          <p id="noPastSessions" class="empty-msg hidden">No previous sessions recorded.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-activity" class="section hidden">
+      <div class="activity-header">
+        <h3>Today's Activity Log</h3>
+        <p class="activity-sub">All actions performed during this session</p>
+      </div>
+      <ul id="activityList" class="activity-list"></ul>
+      <p id="noActivity" class="empty-msg hidden">No activity recorded yet.</p>
+    </section>
+
+  </main>
+
+  <div id="viewModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">✕</button>
+      <h3>Patient Record Details</h3>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  
+  <div id="toastContainer" class="toast-container"></div>
+</body>
+</html>
